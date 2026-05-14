@@ -50,7 +50,7 @@ COR_POWERUP_ESCUDO     = (50,  180, 255)   # azul claro
 COR_OBSTACULO = (200,  40,  40)
 
 tela = pygame.display.set_mode((LARGURA, ALTURA))
-pygame.display.set_caption("Snake Game")
+pygame.display.set_caption("SnakePython")
 clock = pygame.time.Clock()
 
 fonte_titulo = pygame.font.SysFont("arial", 48, bold=True)
@@ -299,7 +299,7 @@ def desenhar_legenda(y_inicio):
 # ── Telas ────────────────────────────────────────────
 def tela_menu():
     tela.fill(FUNDO)
-    desenhar_texto("SNAKE GAME", fonte_titulo, ROXO_PRINCIPAL, LARGURA//2, 80)
+    desenhar_texto("SnakePython", fonte_titulo, ROXO_PRINCIPAL, LARGURA//2, 80)
     desenhar_texto("Um jogo criado por WRyan", fonte_texto, AZUL_NEON, LARGURA//2, 140)
     desenhar_texto(f"Recorde: {high_score}", fonte_texto, ROXO_CLARO, LARGURA//2, 190)
 
