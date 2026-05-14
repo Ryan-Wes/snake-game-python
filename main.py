@@ -3,6 +3,7 @@ import sys
 import random
 import json
 import os
+import asyncio
 
 pygame.init()
 pygame.mixer.init()
@@ -332,150 +333,149 @@ def tela_game_over_func(score):
     pygame.display.flip()
 
 # ── Loop principal ───────────────────────────────────
-cobra, direcao, proxima_direcao, comida, score, nivel, obstaculos, powerup, com_escudo, escudo_ticks = reiniciar_jogo()
-tempo_movimento = 0
+async def main():
+    global high_score, estado_jogo
 
-while True:
-    dt = clock.tick(FPS)
+    cobra, direcao, proxima_direcao, comida, score, nivel, obstaculos, powerup, com_escudo, escudo_ticks = reiniciar_jogo()
+    tempo_movimento = 0
 
-    for evento in pygame.event.get():
-        if evento.type == pygame.QUIT:
-            salvar_highscore(high_score)
-            pygame.quit()
-            sys.exit()
+    while True:
+        dt = clock.tick(FPS)
 
-        if evento.type == pygame.KEYDOWN:
-            if estado_jogo == MENU:
-                if evento.key == pygame.K_RETURN:
-                    cobra, direcao, proxima_direcao, comida, score, nivel, obstaculos, powerup, com_escudo, escudo_ticks = reiniciar_jogo()
-                    estado_jogo = JOGANDO
-                elif evento.key == pygame.K_ESCAPE:
-                    salvar_highscore(high_score)
-                    pygame.quit()
-                    sys.exit()
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                salvar_highscore(high_score)
+                pygame.quit()
+                sys.exit()
 
-            elif estado_jogo == JOGANDO:
-                if evento.key == pygame.K_UP    and direcao != "DOWN":  proxima_direcao = "UP"
-                elif evento.key == pygame.K_DOWN  and direcao != "UP":   proxima_direcao = "DOWN"
-                elif evento.key == pygame.K_LEFT  and direcao != "RIGHT": proxima_direcao = "LEFT"
-                elif evento.key == pygame.K_RIGHT and direcao != "LEFT":  proxima_direcao = "RIGHT"
-                elif evento.key == pygame.K_p: estado_jogo = PAUSADO
-                elif evento.key == pygame.K_ESCAPE: estado_jogo = MENU
+            if evento.type == pygame.KEYDOWN:
+                if estado_jogo == MENU:
+                    if evento.key == pygame.K_RETURN:
+                        cobra, direcao, proxima_direcao, comida, score, nivel, obstaculos, powerup, com_escudo, escudo_ticks = reiniciar_jogo()
+                        estado_jogo = JOGANDO
+                    elif evento.key == pygame.K_ESCAPE:
+                        salvar_highscore(high_score)
+                        pygame.quit()
+                        sys.exit()
 
-            elif estado_jogo == PAUSADO:
-                if evento.key == pygame.K_p: estado_jogo = JOGANDO
-                elif evento.key == pygame.K_ESCAPE: estado_jogo = MENU
+                elif estado_jogo == JOGANDO:
+                    if evento.key == pygame.K_UP    and direcao != "DOWN":  proxima_direcao = "UP"
+                    elif evento.key == pygame.K_DOWN  and direcao != "UP":   proxima_direcao = "DOWN"
+                    elif evento.key == pygame.K_LEFT  and direcao != "RIGHT": proxima_direcao = "LEFT"
+                    elif evento.key == pygame.K_RIGHT and direcao != "LEFT":  proxima_direcao = "RIGHT"
+                    elif evento.key == pygame.K_p: estado_jogo = PAUSADO
+                    elif evento.key == pygame.K_ESCAPE: estado_jogo = MENU
 
-            elif estado_jogo == GAME_OVER:
-                if evento.key == pygame.K_r:
-                    cobra, direcao, proxima_direcao, comida, score, nivel, obstaculos, powerup, com_escudo, escudo_ticks = reiniciar_jogo()
-                    estado_jogo = JOGANDO
-                elif evento.key == pygame.K_m: estado_jogo = MENU
-                elif evento.key == pygame.K_ESCAPE:
-                    salvar_highscore(high_score)
-                    pygame.quit()
-                    sys.exit()
+                elif estado_jogo == PAUSADO:
+                    if evento.key == pygame.K_p: estado_jogo = JOGANDO
+                    elif evento.key == pygame.K_ESCAPE: estado_jogo = MENU
 
-    # ── Lógica de jogo ───────────────────────────────
-    if estado_jogo == JOGANDO:
-        tocar_musica("assets/sounds/game_song.mp3")
+                elif estado_jogo == GAME_OVER:
+                    if evento.key == pygame.K_r:
+                        cobra, direcao, proxima_direcao, comida, score, nivel, obstaculos, powerup, com_escudo, escudo_ticks = reiniciar_jogo()
+                        estado_jogo = JOGANDO
+                    elif evento.key == pygame.K_m: estado_jogo = MENU
+                    elif evento.key == pygame.K_ESCAPE:
+                        salvar_highscore(high_score)
+                        pygame.quit()
+                        sys.exit()
 
-        # escudo
-        if com_escudo:
-            escudo_ticks -= 1
-            if escudo_ticks <= 0:
-                com_escudo = False
-                escudo_ticks = 0
+        # ── Lógica de jogo ───────────────────────────────
+        if estado_jogo == JOGANDO:
+            tocar_musica("assets/sounds/game_song.mp3")
 
-        # power-up: gerar se não existe
-        if powerup is None or not powerup.ativo:
-            if random.random() < 0.003:  # ~0.3% chance por frame
-                powerup = PowerUp(cobra, obstaculos)
-            else:
-                powerup = None
-
-        if powerup:
-            powerup.atualizar()
-
-        # movimento
-        velocidade = velocidade_base(nivel) + (score // 5)
-        tempo_movimento += dt
-
-        if tempo_movimento >= 1000 // velocidade:
-            tempo_movimento = 0
-            direcao = proxima_direcao
-
-            # mover cobra
-            cx, cy = cobra[0]
-            if direcao == "UP":    cy -= TAMANHO_BLOCO
-            elif direcao == "DOWN":  cy += TAMANHO_BLOCO
-            elif direcao == "LEFT":  cx -= TAMANHO_BLOCO
-            elif direcao == "RIGHT": cx += TAMANHO_BLOCO
-
-            nova_cabeca = [cx, cy]
-            cobra.insert(0, nova_cabeca)
-
-            # colisão com power-up
-            if powerup and powerup.ativo and nova_cabeca == powerup.posicao:
-                if powerup.tipo == PowerUp.VELOCIDADE:
-                    nivel = min(nivel + 1, 10)
-                elif powerup.tipo == PowerUp.PONTOS:
-                    score += 5
-                elif powerup.tipo == PowerUp.ESCUDO:
-                    com_escudo = True
-                    escudo_ticks = 180
-                powerup.ativo = False
-
-            # comeu comida
-            if nova_cabeca == comida:
-                score += 1
-                som_comer.play()
-                comida = gerar_comida(cobra, obstaculos)
-
-                # novo nível a cada 5 pontos
-                novo_nivel = 1 + score // 5
-                if novo_nivel != nivel:
-                    nivel = novo_nivel
-                    obstaculos = gerar_obstaculos(cobra, comida, quantidade_obstaculos(nivel))
-            else:
-                cobra.pop()
-
-            # colisões
-            cabeca = cobra[0]
-            bateu_parede = cabeca[0] < 0 or cabeca[0] >= LARGURA or cabeca[1] < ALTURA_HUD or cabeca[1] >= ALTURA
-            bateu_si = cabeca in cobra[1:]
-            obs_set = set(map(tuple, obstaculos))
-            bateu_obstaculo = tuple(cabeca) in obs_set
-
-            if bateu_parede or bateu_si or (bateu_obstaculo and not com_escudo):
-                if bateu_obstaculo and com_escudo:
+            if com_escudo:
+                escudo_ticks -= 1
+                if escudo_ticks <= 0:
                     com_escudo = False
                     escudo_ticks = 0
+
+            if powerup is None or not powerup.ativo:
+                if random.random() < 0.003:
+                    powerup = PowerUp(cobra, obstaculos)
                 else:
-                    if score > high_score:
-                        high_score = score
-                        salvar_highscore(high_score)
-                    som_game_over.play()
-                    estado_jogo = GAME_OVER
+                    powerup = None
 
-        # ── Render ───────────────────────────────────
-        tela.fill(FUNDO)
-        desenhar_grid()
-        desenhar_obstaculos(obstaculos)
-        desenhar_cobra(cobra, direcao, com_escudo)
-        desenhar_comida(comida)
-        if powerup and powerup.ativo:
-            powerup.desenhar()
-        desenhar_hud(score, nivel, com_escudo, escudo_ticks)
-        pygame.display.flip()
+            if powerup:
+                powerup.atualizar()
 
-    elif estado_jogo == MENU:
-        tocar_musica("assets/sounds/menu_song.mp3")
-        tela_menu()
+            velocidade = velocidade_base(nivel) + (score // 5)
+            tempo_movimento += dt
 
-    elif estado_jogo == GAME_OVER:
-        tocar_musica("assets/sounds/menu_song.mp3")
-        tela_game_over_func(score)
+            if tempo_movimento >= 1000 // velocidade:
+                tempo_movimento = 0
+                direcao = proxima_direcao
 
-    elif estado_jogo == PAUSADO:
-        tela_pausa()
+                cx, cy = cobra[0]
+                if direcao == "UP":    cy -= TAMANHO_BLOCO
+                elif direcao == "DOWN":  cy += TAMANHO_BLOCO
+                elif direcao == "LEFT":  cx -= TAMANHO_BLOCO
+                elif direcao == "RIGHT": cx += TAMANHO_BLOCO
+
+                nova_cabeca = [cx, cy]
+                cobra.insert(0, nova_cabeca)
+
+                if powerup and powerup.ativo and nova_cabeca == powerup.posicao:
+                    if powerup.tipo == PowerUp.VELOCIDADE:
+                        nivel = min(nivel + 1, 10)
+                    elif powerup.tipo == PowerUp.PONTOS:
+                        score += 5
+                    elif powerup.tipo == PowerUp.ESCUDO:
+                        com_escudo = True
+                        escudo_ticks = 180
+                    powerup.ativo = False
+
+                if nova_cabeca == comida:
+                    score += 1
+                    som_comer.play()
+                    comida = gerar_comida(cobra, obstaculos)
+
+                    novo_nivel = 1 + score // 5
+                    if novo_nivel != nivel:
+                        nivel = novo_nivel
+                        obstaculos = gerar_obstaculos(cobra, comida, quantidade_obstaculos(nivel))
+                else:
+                    cobra.pop()
+
+                cabeca = cobra[0]
+                bateu_parede = cabeca[0] < 0 or cabeca[0] >= LARGURA or cabeca[1] < ALTURA_HUD or cabeca[1] >= ALTURA
+                bateu_si = cabeca in cobra[1:]
+                obs_set = set(map(tuple, obstaculos))
+                bateu_obstaculo = tuple(cabeca) in obs_set
+
+                if bateu_parede or bateu_si or (bateu_obstaculo and not com_escudo):
+                    if bateu_obstaculo and com_escudo:
+                        com_escudo = False
+                        escudo_ticks = 0
+                    else:
+                        if score > high_score:
+                            high_score = score
+                            salvar_highscore(high_score)
+                        som_game_over.play()
+                        estado_jogo = GAME_OVER
+
+            tela.fill(FUNDO)
+            desenhar_grid()
+            desenhar_obstaculos(obstaculos)
+            desenhar_cobra(cobra, direcao, com_escudo)
+            desenhar_comida(comida)
+            if powerup and powerup.ativo:
+                powerup.desenhar()
+            desenhar_hud(score, nivel, com_escudo, escudo_ticks)
+            pygame.display.flip()
+
+        elif estado_jogo == MENU:
+            tocar_musica("assets/sounds/menu_song.mp3")
+            tela_menu()
+
+        elif estado_jogo == GAME_OVER:
+            tocar_musica("assets/sounds/menu_song.mp3")
+            tela_game_over_func(score)
+
+        elif estado_jogo == PAUSADO:
+            tela_pausa()
+
+        await asyncio.sleep(0)
+
+
+asyncio.run(main())
