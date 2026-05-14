@@ -1,34 +1,51 @@
 # 🐍 Snake Game - Cyberpunk Edition
 
-Jogo 2D desenvolvido em Python utilizando a biblioteca **Pygame**, com visual inspirado em estilo **cyberpunk neon**.
+Jogo 2D desenvolvido em Python com **Pygame**, visual cyberpunk neon, power-ups, obstáculos e high score persistido.
 
 ---
 
 ## 🎮 Funcionalidades
 
-- Menu inicial com instruções
-- Sistema de pontuação e recorde
-- Dificuldade progressiva
-- Sistema de pausa
-- HUD personalizada
+- Menu com legenda visual dos itens do jogo
+- Power-ups com formas e cores distintas
+- Obstáculos que aumentam a cada nível
+- High score salvo em arquivo (persiste entre sessões)
+- Dificuldade progressiva (velocidade e obstáculos por nível)
+- Sistema de pausa com legenda
+- HUD com score, recorde, nível e barra de escudo
 - Animação da cobra (olhos e língua dinâmica)
-- Efeitos sonoros
-- Música de fundo dinâmica (menu e gameplay)
+- Efeitos sonoros e música dinâmica (menu / gameplay)
+
+---
+
+## ⚡ Power-ups
+
+| Visual | Nome | Efeito |
+|---|---|---|
+| Círculo amarelo | Velocidade | Sobe um nível imediatamente |
+| Círculo verde | +5 Pontos | Bônus direto de pontuação |
+| Círculo azul | Escudo | Protege 1 batida em obstáculo |
+
+---
+
+## 🔴 Obstáculos
+
+Blocos vermelhos fixos no mapa. Aparecem a partir do nível 1 e aumentam a cada nível (máx 20). Bater neles sem escudo = game over.
 
 ---
 
 ## 🕹️ Controles
 
-- **Enter** → Iniciar o jogo  
-- **Setas (↑ ↓ ← →)** → Movimentar a cobra  
-- **P** → Pausar / Despausar  
-- **ESC** → Voltar ao menu / sair  
-- **R** → Reiniciar após Game Over  
-- **M** → Voltar ao menu após Game Over  
+- **Enter** → Iniciar o jogo
+- **Setas (↑ ↓ ← →)** → Movimentar a cobra
+- **P** → Pausar / Despausar
+- **ESC** → Voltar ao menu / sair
+- **R** → Reiniciar após Game Over
+- **M** → Voltar ao menu após Game Over
 
 ---
 
-## ⚙️ Tecnologias utilizadas
+## ⚙️ Tecnologias
 
 - Python 3
 - Pygame
@@ -37,12 +54,6 @@ Jogo 2D desenvolvido em Python utilizando a biblioteca **Pygame**, com visual in
 
 ## 📦 Como executar
 
-### 🔹 Opção 1 — Executável
-
-Baixe o arquivo `.exe` e mantenha a pasta `assets` no mesmo diretório.
-
-### 🔹 Opção 2 — Código fonte
-
 ```bash
 pip install pygame
 python main.py
@@ -50,33 +61,12 @@ python main.py
 
 ---
 
-## 📁 Estrutura do projeto
-
-```plaintext
-snake-game-python/
-├── main.py
-├── assets/
-│   └── sounds/
-├── README.md
-├── COMANDOS.txt
-└── .gitignore
-```
-
----
-
-## 🎨 Estilo visual
-
-Paleta inspirada em cyberpunk:
-
-- Roxo neon (#c40bff)
-- Azul neon (#00f6f9)
-
----
-
 ## 📌 Observações
 
-Certifique-se de manter a pasta `assets` junto do executável para funcionamento correto dos sons e músicas.
+Mantenha a pasta `assets` junto do executável para funcionamento correto dos sons e músicas.
 
 ---
 
-Desenvolvido por WRyan
+Desenvolvido por WRyan  
+🔗 [LinkedIn](https://www.linkedin.com/in/wryan-lopes)  
+🌐 [Portfólio](https://ryan-wes.github.io/portfolio/)
