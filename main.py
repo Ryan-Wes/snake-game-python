@@ -8,8 +8,8 @@ import asyncio
 pygame.init()
 pygame.mixer.init()
 
-som_comer = pygame.mixer.Sound("assets/sounds/eat.wav")
-som_game_over = pygame.mixer.Sound("assets/sounds/game_over.wav")
+som_comer = pygame.mixer.Sound("assets/sounds/eat.ogg")
+som_game_over = pygame.mixer.Sound("assets/sounds/game_over.ogg")
 musica_atual = None
 
 def tocar_musica(caminho):
@@ -382,7 +382,7 @@ async def main():
 
         # ── Lógica de jogo ───────────────────────────────
         if estado_jogo == JOGANDO:
-            tocar_musica("assets/sounds/game_song.mp3")
+            tocar_musica("assets/sounds/game_song.ogg")
 
             if com_escudo:
                 escudo_ticks -= 1
@@ -465,11 +465,11 @@ async def main():
             pygame.display.flip()
 
         elif estado_jogo == MENU:
-            tocar_musica("assets/sounds/menu_song.mp3")
+            tocar_musica("assets/sounds/menu_song.ogg")
             tela_menu()
 
         elif estado_jogo == GAME_OVER:
-            tocar_musica("assets/sounds/menu_song.mp3")
+            tocar_musica("assets/sounds/menu_song.ogg")
             tela_game_over_func(score)
 
         elif estado_jogo == PAUSADO:

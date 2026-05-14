@@ -20,6 +20,16 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install ffmpeg
+        run: sudo apt-get install -y ffmpeg
+
+      - name: Convert audio to OGG
+        run: |
+          ffmpeg -i assets/sounds/menu_song.mp3 assets/sounds/menu_song.ogg
+          ffmpeg -i assets/sounds/game_song.mp3 assets/sounds/game_song.ogg
+          ffmpeg -i assets/sounds/eat.wav assets/sounds/eat.ogg
+          ffmpeg -i assets/sounds/game_over.wav assets/sounds/game_over.ogg
+
       - name: Install Pygbag
         run: pip install pygbag
 
