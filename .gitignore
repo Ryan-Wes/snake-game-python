@@ -1,0 +1,7 @@
+.vscode/
+__pycache__/
+*.pyc
+*.spec
+build/
+dist/
+highscore.json
