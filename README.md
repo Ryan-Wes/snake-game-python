@@ -22,9 +22,9 @@ Jogo 2D desenvolvido em Python com **Pygame**, visual cyberpunk neon, power-ups,
 
 | Visual | Nome | Efeito |
 |---|---|---|
-| Círculo amarelo | Velocidade | Sobe um nível imediatamente |
-| Círculo verde | +5 Pontos | Bônus direto de pontuação |
-| Círculo azul | Escudo | Protege 1 batida em obstáculo |
+| 🟡 | Velocidade | Sobe um nível imediatamente |
+| 🟢 | +5 Pontos | Bônus direto de pontuação |
+| 🔵 | Escudo | Protege 1 batida em obstáculo |
 
 ---
 
